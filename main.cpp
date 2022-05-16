@@ -31,6 +31,7 @@
   #include <QtWidgets/QMainWindow>
   #include <QtCharts/QChartView>
   #include <QtCharts/QLineSeries>
+  #include <QtCharts/QValueAxis>
   #include <QtCore/QDateTime>
   #include <QtCharts/QDateTimeAxis>
   #include <QtCore/QFile>
@@ -80,15 +81,32 @@
 	  axisX->setFormat("MMM yyyy");
 	  axisX->setTitleText("Date");
 	  chart->addAxis(axisX, Qt::AlignBottom);
-	  seriesA->attachAxis(axisX);
-	  seriesB->attachAxis(axisX);
 
 	  QValueAxis *axisY = new QValueAxis;
 	  axisY->setLabelFormat("%i");
 	  axisY->setTitleText("Sunspots count");
 	  chart->addAxis(axisY, Qt::AlignLeft);
+
+	  seriesA->attachAxis(axisX);
 	  seriesA->attachAxis(axisY);
+	  seriesB->attachAxis(axisX);
 	  seriesB->attachAxis(axisY);
+
+	  // TODO: make generic for a list of QLineSeries'
+	  {
+		  qreal min = 0;
+		  qreal max = 0;
+		  // for QLSB we use seriesA.y() + serieasB.y() because we want STACKED diagrams
+		  for (int i = 0; i < seriesA->count(); ++i) {
+			  if (min > seriesA->at(i).y()) min = seriesA->at(i).y();
+			  if (max < seriesA->at(i).y()) max = seriesA->at(i).y();
+		  }
+		  for (int i = 0; i < seriesB->count(); ++i) {
+			  if (min > seriesB->at(i).y()) min = seriesB->at(i).y();
+			  if (max < seriesB->at(i).y()) max = seriesB->at(i).y();
+		  }
+		  axisY->setRange(min, max);
+	  }
 
 	  QChartView *chartView = new QChartView(chart);
 	  chartView->setRenderHint(QPainter::Antialiasing);
