@@ -32,6 +32,7 @@
   #include <QtCharts/QChartView>
   #include <QtCharts/QLineSeries>
   #include <QtCharts/QValueAxis>
+  #include <QtCharts/QAreaSeries>
   #include <QtCore/QDateTime>
   #include <QtCharts/QDateTimeAxis>
   #include <QtCore/QFile>
@@ -70,9 +71,12 @@
 	  }
 	  sunSpots.close();
 
+	  QAreaSeries * series = new QAreaSeries(seriesA, seriesB);
+
 	  QChart *chart = new QChart();
 	  chart->addSeries(seriesA);
 	  chart->addSeries(seriesB);
+	  chart->addSeries(series);
 	  chart->legend()->hide();
 	  chart->setTitle("Sunspots count (by Space Weather Prediction Center)");
 
@@ -96,7 +100,6 @@
 	  {
 		  qreal min = 0;
 		  qreal max = 0;
-		  // for QLSB we use seriesA.y() + serieasB.y() because we want STACKED diagrams
 		  for (int i = 0; i < seriesA->count(); ++i) {
 			  if (min > seriesA->at(i).y()) min = seriesA->at(i).y();
 			  if (max < seriesA->at(i).y()) max = seriesA->at(i).y();
